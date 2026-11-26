@@ -305,55 +305,45 @@ const m=document.getElementById('menu'),l=document.getElementById('links');
 m.addEventListener('click',()=>{const o=l.classList.toggle('open');m.setAttribute('aria-expanded',o)});
 l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('open');m.setAttribute('aria-expanded','false')}});
 
-// Contadores públicos do LiveX (serviço CounterAPI).
+// Contadores públicos do LiveX. JSONP evita bloqueios de CORS no navegador.
 (() => {
-  const namespace = 'lucasmoraesm6.github.io';
-  const api = 'https://counterapi.com/api/' + namespace;
+  const api = 'https://counterapi.com/api/lucasmoraesm6.github.io';
   const visitsEl = document.getElementById('site-visits');
   const downloadsEl = document.getElementById('apk-downloads');
+  let callbackId = 0;
 
-  async function readCount(action, key, element) {
-    try {
-      const response = await fetch(api + '/' + action + '/' + key + '?readOnly=true', {
-        mode: 'cors', cache: 'no-store'
-      });
-      if (!response.ok) throw new Error('Counter unavailable');
-      const data = await response.json();
-      if (element && Number.isFinite(Number(data.value))) {
+  function request(action, key, readOnly, element) {
+    const callback = '__livexCounter' + (++callbackId);
+    const script = document.createElement('script');
+    const params = new URLSearchParams({ callback });
+    if (readOnly) params.set('readOnly', 'true');
+
+    window[callback] = data => {
+      if (element && data && Number.isFinite(Number(data.value))) {
         element.textContent = Number(data.value).toLocaleString('pt-BR');
       }
-    } catch (_) {
+      delete window[callback];
+      script.remove();
+    };
+    script.onerror = () => {
       if (element) element.textContent = '—';
-    }
+      delete window[callback];
+      script.remove();
+    };
+    script.src = api + '/' + action + '/' + key + '?' + params.toString();
+    document.head.appendChild(script);
   }
 
-  async function track(action, key, element) {
-    try {
-      const response = await fetch(api + '/' + action + '/' + key, {
-        method: 'GET', mode: 'cors', keepalive: true, cache: 'no-store'
-      });
-      if (!response.ok) throw new Error('Counter update failed');
-      const data = await response.json();
-      if (element && Number.isFinite(Number(data.value))) {
-        element.textContent = Number(data.value).toLocaleString('pt-BR');
-      } else if (element) {
-        await readCount(action, key, element);
-      }
-    } catch (_) {
-      if (element) await readCount(action, key, element);
-    }
-  }
-
-  let alreadyCounted = false;
+  let counted = false;
   try {
-    alreadyCounted = sessionStorage.getItem('livex-site-visit-counted') === '1';
-    if (!alreadyCounted) sessionStorage.setItem('livex-site-visit-counted', '1');
+    counted = sessionStorage.getItem('livex-site-visit-counted') === '1';
+    if (!counted) sessionStorage.setItem('livex-site-visit-counted', '1');
   } catch (_) {}
-  if (alreadyCounted) readCount('view', 'site-access', visitsEl);
-  else track('view', 'site-access', visitsEl);
+  request('view', 'site-access', counted, visitsEl);
+  request('download', 'apk-download', true, downloadsEl);
 
   document.querySelectorAll('a[href*="app-release.apk"]').forEach(link => {
-    link.addEventListener('click', () => track('download', 'apk-download', downloadsEl));
+    link.addEventListener('click', () => request('download', 'apk-download', false, downloadsEl));
   });
 })();
 </script>
