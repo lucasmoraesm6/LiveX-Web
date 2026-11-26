@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LiveX — Seu estúdio. Na palma da mão.</title>
+<title>LiveX — Estúdio de transmissão para Android</title>
 <meta name="description" content="LiveX: um estúdio de transmissão completo no Android. Transmita, grave e controle suas cenas com liberdade.">
 <meta name="theme-color" content="#050507"><meta name="color-scheme" content="dark">
 <link rel="icon" href="https://lucasmoraesm6.github.io/LiveX-Web/assets/livex-logo.jpg">
@@ -127,22 +127,6 @@ h1 span{background:linear-gradient(110deg,var(--live),var(--live2) 50%,var(--cy)
 .feat h3{font-size:1.3rem;margin-bottom:8px}
 .feat p{color:var(--mute);font-size:.97rem}
 
-/* CÂMERA */
-.cam{background:linear-gradient(180deg,transparent,var(--bg2) 30%,var(--bg2) 70%,transparent)}
-.cam .wrap{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
-.steps{margin-top:30px;display:grid;gap:14px;list-style:none;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:16px;align-items:flex-start;color:var(--mute)}
-.steps li::before{content:counter(s);flex:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--vio),var(--cy));color:#050507;font-weight:800;display:grid;place-items:center}
-.steps b{color:var(--txt);font-weight:600}
-.pair{display:flex;align-items:center;justify-content:center;gap:0;position:relative}
-.mini{width:140px;aspect-ratio:9/17;border-radius:26px;border:3px solid #34343f;background:var(--card);display:grid;place-items:center;text-align:center;font-size:.8rem;color:var(--mute);padding:12px}
-.mini .qr{width:78px;height:78px;margin:0 auto 10px;border-radius:10px;background:
- conic-gradient(from 90deg at 50% 50%,#fff 25%,transparent 0 50%,#fff 0 75%,transparent 0) 0 0/16px 16px,#050507;border:6px solid #fff}
-.mini img.cm{width:100%;height:100%;object-fit:cover;border-radius:16px}
-.link{width:110px;height:2px;background:repeating-linear-gradient(90deg,var(--cy) 0 8px,transparent 8px 16px);position:relative;animation:dash 1s linear infinite;background-size:16px 2px}
-@keyframes dash{to{background-position:16px 0}}
-.link::after{content:"Wi-Fi";position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:.75rem;color:var(--cy)}
-
 /* DOWNLOAD */
 .dl{padding:30px 0 110px}
 .dl-box{border-radius:34px;padding:70px 40px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#17102e,#3a1a8a 50%,#c2255a);box-shadow:0 40px 90px -40px var(--live)}
@@ -194,7 +178,7 @@ footer a:hover{color:var(--txt)}
   <nav class="wrap" aria-label="Principal">
     <a class="brand" href="#top"><img src="https://lucasmoraesm6.github.io/LiveX-Web/assets/livex-logo.jpg" alt="">LiveX</a>
     <div class="links" id="links">
-      <a href="#plataformas">Plataformas</a><a href="#experiencia">Experiência</a><a href="#recursos">Recursos</a><a href="#camera">LiveX Camera</a><a href="#duvidas">Dúvidas</a>
+      <a href="#plataformas">Plataformas</a><a href="#experiencia">Experiência</a><a href="#recursos">Recursos</a><a href="#duvidas">Dúvidas</a>
     </div>
     <a class="btn pri nav-cta" href="#download">Baixar app</a>
     <button class="menu" id="menu" aria-label="Abrir menu" aria-expanded="false">☰</button>
@@ -210,7 +194,6 @@ footer a:hover{color:var(--txt)}
       <p class="lead">Transmita ao vivo, grave, monte cenas e controle o áudio direto do celular. Um estúdio completo, sem depender de computador.</p>
       <div class="cta" style="flex-direction:column;align-items:flex-start;max-width:340px">
         <a class="btn pri" href="downloads/app-release.apk">↓ Baixar LiveX APK</a>
-        <a class="btn sec" href="downloads/camera-plugin-release.apk">↓ Baixar LiveX Camera APK</a>
       </div>
       <p class="fine">Download oficial · Android 8.0 ou superior · <a href="https://github.com/lucasmoraesm6/LiveX/releases">Ver versões</a></p>
       <ul class="tags"><li>RTMP / RTMPS</li><li>Gravação MP4</li><li>Cenas e fontes</li><li>Mixer de áudio</li></ul>
@@ -228,7 +211,6 @@ footer a:hover{color:var(--txt)}
           <div class="bar"><b><em>◉</em>Live</b><b><em>▣</em>Gravar</b><b><em>▤</em>Cenas</b><b><em>♫</em>Áudio</b><b><em>◷</em>Clipes</b></div>
         </div>
       </div></div>
-      <div class="chip a">📱 Segunda câmera<small>Conectada por Wi-Fi</small></div>
       <div class="chip b">⏺ Gravando em MP4<small>Salvo no aparelho</small></div>
     </div>
   </div>
@@ -255,7 +237,6 @@ footer a:hover{color:var(--txt)}
     <p class="lead">Um visual pensado para quem joga, cria conteúdo e quer levar uma estrutura de streaming completa para onde estiver.</p>
     <div class="bento">
       <article class="tile t1"><img loading="lazy" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1400&q=85" alt="Setup gamer com iluminação"><div><small>Gaming e streaming</small><h3>Entre no jogo sem sair do controle.</h3><p>Cenas, fontes, áudio e transmissão reunidos em uma só tela.</p></div></article>
-      <article class="tile t2"><img loading="lazy" src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=85" alt="Câmera profissional"><div><small>LiveX Camera</small><h3>Mais ângulos</h3><p>Use outro celular como câmera sem fio.</p></div></article>
       <article class="tile t3"><img loading="lazy" src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=900&q=85" alt="Mesa de criação"><div><small>Creator setup</small><h3>Estúdio onde estiver</h3><p>Leve sua produção para qualquer lugar.</p></div></article>
       <article class="tile t4"><img loading="lazy" src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1600&q=85" alt="Computador gamer" style="object-position:center 40%"><div><small>Performance</small><h3>Uma central de produção no Android.</h3></div></article>
     </div>
@@ -277,31 +258,14 @@ footer a:hover{color:var(--txt)}
   </div>
 </section>
 
-<section class="cam" id="camera">
-  <div class="wrap">
-    <div>
-      <h2>Transforme outro celular em câmera.</h2>
-      <p class="lead">O LiveX Camera usa um segundo Android como câmera sem fio e envia o vídeo pela rede Wi-Fi local.</p>
-      <ol class="steps">
-        <li><span><b>Instale o LiveX Camera</b> no segundo celular.</span></li>
-        <li><span><b>Escaneie o QR Code</b> mostrado no LiveX para parear.</span></li>
-        <li><span><b>Use como fonte</b> nas suas cenas, no ângulo que quiser.</span></li>
-      </ol>
-    </div>
-    <div class="pair" aria-hidden="true">
-      <div class="mini"><div><div class="qr"></div>Pareie com<br>QR Code</div></div>
-      <div class="link"></div>
-      <div class="mini" style="padding:0;overflow:hidden"><img class="cm" src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80" alt=""></div>
-    </div>
-  </div>
-</section>
+
 
 <section class="dl" id="download">
   <div class="wrap">
     <div class="dl-box">
       <h2>Leve seu estúdio com você.</h2>
       <p>Baixe o LiveX oficial e transforme seu Android em um estúdio de transmissão.</p>
-      <p>Instale o LiveX no celular principal e o LiveX Camera no segundo celular. Conecte os dois à mesma rede Wi-Fi. No LiveX, abra a opção de adicionar uma câmera e escolha o pareamento por QR Code. No segundo celular, abra o LiveX Camera e escaneie o QR Code exibido no aparelho principal. Depois de conectar, selecione a câmera como fonte em uma cena.</p>
+      <p>O LiveX Camera está temporariamente desativado. Estamos concentrando esta etapa na estabilidade da gravação e transmissão do aplicativo principal.</p>
     </div>
   </div>
 </section>
@@ -334,4 +298,4 @@ l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('op
 </script>
 </body>
 </html>
-<!-- LiveX release sync: build 18 (2026-11-26) -->
+<!-- LiveX: página simplificada — foco em estabilidade; LiveX Camera temporariamente desativado (2026-11-26) -->
