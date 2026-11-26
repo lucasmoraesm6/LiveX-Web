@@ -305,8 +305,7 @@ const m=document.getElementById('menu'),l=document.getElementById('links');
 m.addEventListener('click',()=>{const o=l.classList.toggle('open');m.setAttribute('aria-expanded',o)});
 l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('open');m.setAttribute('aria-expanded','false')}});
 
-// Contadores públicos do LiveX. Acesso é contado uma vez por aba/sessão;
-// downloads são registrados quando o visitante inicia o download do APK.
+// Contadores públicos do LiveX (serviço CounterAPI).
 (() => {
   const namespace = 'lucasmoraesm6.github.io';
   const api = 'https://counterapi.com/api/' + namespace;
@@ -315,7 +314,9 @@ l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('op
 
   async function readCount(action, key, element) {
     try {
-      const response = await fetch(api + '/' + action + '/' + key + '?readOnly=true', { cache: 'no-store' });
+      const response = await fetch(api + '/' + action + '/' + key + '?readOnly=true', {
+        mode: 'cors', cache: 'no-store'
+      });
       if (!response.ok) throw new Error('Counter unavailable');
       const data = await response.json();
       if (element && Number.isFinite(Number(data.value))) {
@@ -326,30 +327,34 @@ l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('op
     }
   }
 
-  function track(action, key) {
-    fetch(api + '/' + action + '/' + key, {
-      method: 'GET',
-      mode: 'cors',
-      keepalive: true,
-      cache: 'no-store'
-    }).catch(() => {});
+  async function track(action, key, element) {
+    try {
+      const response = await fetch(api + '/' + action + '/' + key, {
+        method: 'GET', mode: 'cors', keepalive: true, cache: 'no-store'
+      });
+      if (!response.ok) throw new Error('Counter update failed');
+      const data = await response.json();
+      if (element && Number.isFinite(Number(data.value))) {
+        element.textContent = Number(data.value).toLocaleString('pt-BR');
+      } else if (element) {
+        await readCount(action, key, element);
+      }
+    } catch (_) {
+      if (element) await readCount(action, key, element);
+    }
   }
 
+  let alreadyCounted = false;
   try {
-    if (!sessionStorage.getItem('livex-site-visit-counted')) {
-      track('view', 'site-access');
-      sessionStorage.setItem('livex-site-visit-counted', '1');
-    }
-  } catch (_) {
-    track('view', 'site-access');
-  }
+    alreadyCounted = sessionStorage.getItem('livex-site-visit-counted') === '1';
+    if (!alreadyCounted) sessionStorage.setItem('livex-site-visit-counted', '1');
+  } catch (_) {}
+  if (alreadyCounted) readCount('view', 'site-access', visitsEl);
+  else track('view', 'site-access', visitsEl);
 
   document.querySelectorAll('a[href*="app-release.apk"]').forEach(link => {
-    link.addEventListener('click', () => track('download', 'apk-download'));
+    link.addEventListener('click', () => track('download', 'apk-download', downloadsEl));
   });
-
-  readCount('view', 'site-access', visitsEl);
-  readCount('download', 'apk-download', downloadsEl);
 })();
 </script>
 </body>
