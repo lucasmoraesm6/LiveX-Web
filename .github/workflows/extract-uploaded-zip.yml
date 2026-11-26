@@ -1,0 +1,68 @@
+name: Extract uploaded LiveX Web project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'LiveX-Web-main.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'Upload')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP safely
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile
+          import shutil
+
+          archive = Path("LiveX-Web-main.zip")
+          if not archive.is_file():
+              raise SystemExit("Envie LiveX-Web-main.zip para a raiz do repositório.")
+          root = Path(".").resolve()
+          expected = "LiveX-Web-main"
+          with ZipFile(archive) as z:
+              for info in z.infolist():
+                  item = PurePosixPath(info.filename)
+                  if item.is_absolute() or ".." in item.parts:
+                      raise SystemExit(f"Caminho inseguro no ZIP: {info.filename}")
+                  if not item.parts or item.parts[0] != expected:
+                      raise SystemExit(f"Entrada fora da pasta esperada: {info.filename}")
+                  relative = Path(*item.parts[1:])
+                  if not relative.parts:
+                      continue
+                  if relative.as_posix() == ".github/workflows/extract-uploaded-zip.yml":
+                      continue
+                  target = (root / relative).resolve()
+                  if root not in target.parents:
+                      raise SystemExit(f"Destino fora do repositório: {info.filename}")
+                  if info.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with z.open(info) as source, target.open("wb") as destination:
+                      shutil.copyfileobj(source, destination)
+          archive.unlink()
+          PY
+
+      - name: Commit extracted project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração para confirmar."
+            exit 0
+          fi
+          git commit -m "Importa e extrai site LiveX corrigido"
+          git push
