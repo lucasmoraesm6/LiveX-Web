@@ -293,8 +293,8 @@ footer a:hover{color:var(--txt)}
     <div><a class="brand" href="#top"><img src="https://lucasmoraesm6.github.io/LiveX-Web/assets/livex-logo.jpg" alt="">LiveX</a><p style="margin-top:8px">© LiveX · Projeto independente · Criado por Lucas Moraes</p></div>
     <div class="f"><a href="https://github.com/lucasmoraesm6/LiveX-Web">GitHub</a><a href="https://github.com/lucasmoraesm6/LiveX/releases">Versões</a></div>
     <div class="site-stats" aria-label="Estatísticas do site">
-      <div class="site-stat"><span class="stat-icon" aria-hidden="true">◉</span><span>Acessos ao site</span><strong id="site-visits" aria-live="polite">—</strong></div>
-      <div class="site-stat"><span class="stat-icon" aria-hidden="true">↓</span><span>Downloads do APK</span><strong id="apk-downloads" aria-live="polite">—</strong></div>
+      <div class="site-stat"><span class="stat-icon" aria-hidden="true">◉</span><span>Acessos ao site</span><strong id="site-visits" aria-live="polite"><span class="counterapi" ns="lucasmoraesm6.github.io" action="view" key="site-access" noCss="true" noIcon="true">0</span></strong></div>
+      <div class="site-stat"><span class="stat-icon" aria-hidden="true">↓</span><span>Downloads do APK</span><strong id="apk-downloads" aria-live="polite"><span class="counterapi" ns="lucasmoraesm6.github.io" action="download" key="apk-download" readOnly="true" noCss="true" noIcon="true">0</span></strong></div>
     </div>
   </div>
 </footer>
@@ -303,49 +303,15 @@ footer a:hover{color:var(--txt)}
 const m=document.getElementById('menu'),l=document.getElementById('links');
 m.addEventListener('click',()=>{const o=l.classList.toggle('open');m.setAttribute('aria-expanded',o)});
 l.addEventListener('click',e=>{if(e.target.tagName==='A'){l.classList.remove('open');m.setAttribute('aria-expanded','false')}});
-
-// Contadores públicos do LiveX. JSONP evita bloqueios de CORS no navegador.
-(() => {
-  const api = 'https://counterapi.com/api/lucasmoraesm6.github.io';
-  const visitsEl = document.getElementById('site-visits');
-  const downloadsEl = document.getElementById('apk-downloads');
-  let callbackId = 0;
-
-  function request(action, key, readOnly, element) {
-    const callback = '__livexCounter' + (++callbackId);
-    const script = document.createElement('script');
-    const params = new URLSearchParams({ callback });
-    if (readOnly) params.set('readOnly', 'true');
-
-    window[callback] = data => {
-      if (element && data && Number.isFinite(Number(data.value))) {
-        element.textContent = Number(data.value).toLocaleString('pt-BR');
-      }
-      delete window[callback];
-      script.remove();
-    };
-    script.onerror = () => {
-      if (element) element.textContent = '—';
-      delete window[callback];
-      script.remove();
-    };
-    script.src = api + '/' + action + '/' + key + '?' + params.toString();
-    document.head.appendChild(script);
-  }
-
-  let counted = false;
-  try {
-    counted = sessionStorage.getItem('livex-site-visit-counted') === '1';
-    if (!counted) sessionStorage.setItem('livex-site-visit-counted', '1');
-  } catch (_) {}
-  request('view', 'site-access', counted, visitsEl);
-  request('download', 'apk-download', true, downloadsEl);
-
-  document.querySelectorAll('a[href*="app-release.apk"]').forEach(link => {
-    link.addEventListener('click', () => request('download', 'apk-download', false, downloadsEl));
+// Registra cada clique real no APK por um pixel invisível, sem bloquear o download.
+document.querySelectorAll('a[href*="app-release.apk"]').forEach(link=>{
+  link.addEventListener('click',()=>{
+    const pixel=new Image();
+    pixel.src='https://counterapi.com/pixel.gif?ns=lucasmoraesm6.github.io&action=download&key=apk-download&t='+Date.now();
   });
-})();
+});
 </script>
+<script src="https://counterapi.com/c.js" async></script>
 </body>
 </html>
 
