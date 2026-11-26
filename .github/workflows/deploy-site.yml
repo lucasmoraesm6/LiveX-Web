@@ -1,4 +1,5 @@
 name: Deploy LiveX website
+# Always fetch the newest signed APKs from the latest LiveX release.
 on:
   push:
     branches: [main]
