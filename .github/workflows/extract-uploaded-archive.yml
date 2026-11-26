@@ -1,0 +1,47 @@
+name: Extract uploaded project archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/extract-uploaded-archive.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: extract-uploaded-archive
+  cancel-in-progress: false
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract archive into repository root
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARCHIVE="LiveX-Web-main.zip"
+          test -f "$ARCHIVE"
+          mkdir -p /tmp/livex-extract
+          unzip -q "$ARCHIVE" -d /tmp/livex-extract
+          test -d /tmp/livex-extract/LiveX-Web-main
+          cp -a /tmp/livex-extract/LiveX-Web-main/. .
+          rm -f "$ARCHIVE"
+          rm -rf /tmp/livex-extract
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Extract LiveX Web project from uploaded archive"
+            git push
+          fi
