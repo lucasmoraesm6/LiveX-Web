@@ -1,5 +1,5 @@
 name: Deploy LiveX website
-# Always fetch the newest signed APKs from the latest LiveX release.
+# Publish only the main LiveX APK from the latest release.
 on:
   push:
     branches: [main]
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download private LiveX APKs
+      - name: Download private LiveX APK
         env:
           LIVEX_READ_TOKEN: ${{ secrets.LIVEX_READ_TOKEN }}
         run: |
@@ -35,11 +35,12 @@ jobs:
             exit 1
           fi
           mkdir -p downloads
+          rm -f downloads/camera-plugin-release.apk
           release_json="$(curl -fsSL \
             -H "Authorization: Bearer $LIVEX_READ_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/lucasmoraesm6/LiveX/releases/latest)"
-          for asset_name in app-release.apk camera-plugin-release.apk; do
+          for asset_name in app-release.apk; do
             asset_url="$(printf '%s' "$release_json" | jq -r --arg name "$asset_name" '.assets[] | select(.name == $name) | .url' | head -n 1)"
             if [ -z "$asset_url" ] || [ "$asset_url" = "null" ]; then
               echo "::error::Release asset not found: $asset_name"
